@@ -1,4 +1,4 @@
-package Animals;
+package Model;
 
 public enum AnimalType {
     Pig,

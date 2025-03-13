@@ -1,4 +1,4 @@
-package Animals;
+package Model;
 
 public class Field {
     public static final int MAX_OCCUPANCY = 10;

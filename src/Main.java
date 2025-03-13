@@ -1,6 +1,7 @@
-import Animals.AnimalType;
-import Animals.Field;
-import People.Farmer;
+import Actor.Enclosure;
+import Model.AnimalType;
+import Model.Field;
+import Actor.Farmer;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -8,14 +9,13 @@ import java.util.List;
 
 import static Service.PropertyManager.getProp;
 import static Service.PropertyManager.loadProps;
-import static Service.TickHandler.beginTickLoop;
+import static Service.TickHandler.runTickLoop;
 
 public class Main {
     public static void main(String[] args) throws InterruptedException {
         loadProps();
-        List<AnimalType> enclosure = Collections.synchronizedList(new ArrayList<>());
-        createFarmers(enclosure);
-        beginTickLoop(enclosure);
+        createActors();
+        runTickLoop();
     }
 
     private static List<Field> createFields() {
@@ -30,10 +30,12 @@ public class Main {
         );
     }
 
-    private static void createFarmers(List<AnimalType> enclosure) {
+    private static void createActors() {
+        new Enclosure().start();
         List<Field> fields = createFields();
-        for(int i = 1; i <= getProp("farmer_amount"); i++) {
-            new Farmer(i, enclosure, fields).start();
+        int farmerAmount = getProp("farmer_amount");
+        for(int i = 1; i <= farmerAmount; i++) {
+            new Farmer(i, fields).start();
         }
     }
 }

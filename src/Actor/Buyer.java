@@ -1,4 +1,4 @@
-package People;
+package Actor;
 
 public class Buyer extends Thread {
     @Override
