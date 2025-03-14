@@ -11,8 +11,12 @@ public class Field {
         this.animalType = animalType;
     }
 
-    public void buyerPresent(boolean isPresent) {
+    public synchronized void buyerPresent(boolean isPresent) {
         this.buyerPresent = isPresent;
+    }
+
+    public synchronized void reduceAmount() {
+        this.currAmount -= 1;
     }
 
     public int getAmount() {

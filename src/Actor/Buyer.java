@@ -11,7 +11,7 @@ public class Buyer extends Thread {
     private final int id;
     private final String threadName;
     private Field fieldOfChoice;
-    private Random decisionMaker = new Random();
+    private final Random decisionMaker = new Random();
 
     public Buyer(int id, List<Field> fields) {
         this.id = id;
@@ -25,9 +25,21 @@ public class Buyer extends Thread {
        this.fieldOfChoice = this.fields.get(choice);
     }
 
+    public Field getFieldOfChoice() {
+        return this.fieldOfChoice;
+    }
+
     @Override
     public void run() {
+        this.fieldOfChoice.buyerPresent(true);
         while (this.fieldOfChoice.getAmount() == 0) {}
+
+        // buyer bought an animal
+        this.fieldOfChoice.reduceAmount();
+
+        // buyer leaves
+        this.fieldOfChoice.buyerPresent(false);
+
 
         // Functionality Here
         /*

@@ -1,3 +1,4 @@
+import Actor.BuyerHandler;
 import Actor.Enclosure;
 import Model.AnimalType;
 import Model.Field;
@@ -37,5 +38,6 @@ public class Main {
         for(int i = 1; i <= farmerAmount; i++) {
             new Farmer(i, fields).start();
         }
+        new BuyerHandler(fields).start();
     }
 }
