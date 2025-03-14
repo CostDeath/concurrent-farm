@@ -1,9 +1,8 @@
 import Actor.Enclosure;
+import Actor.Farmer;
 import Model.AnimalType;
 import Model.Field;
-import Actor.Farmer;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -34,7 +33,7 @@ public class Main {
         new Enclosure().start();
         List<Field> fields = createFields();
         int farmerAmount = getProp("farmer_amount");
-        for(int i = 1; i <= farmerAmount; i++) {
+        for (int i = 1; i <= farmerAmount; i++) {
             new Farmer(i, fields).start();
         }
     }

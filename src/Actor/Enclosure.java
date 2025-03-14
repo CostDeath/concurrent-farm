@@ -14,6 +14,8 @@ import static Service.TickHandler.getCurrTick;
 public class Enclosure extends Thread {
     private static final int ANIMAL_SPAWN_CHANCE = getProp("animal_spawn_chance");
     private static final int ANIMAL_SPAWN_AMOUNT = getProp("animal_spawn_amount");
+    private static final int ENCLOSURE_COLLECTION_DELAY = getProp("enclosure_collection_delay");
+    private static final int FARMER_INVENTORY_CAP =  getProp("farmer_inventory_size");
     private static final List<AnimalType> enclosure = Collections.synchronizedList(new ArrayList<>());
     private int lastTick = 0;
 
@@ -22,8 +24,13 @@ public class Enclosure extends Thread {
     }
 
     public static synchronized int getAnimalsFromEnclosure(List<AnimalType> inventory) {
-        int amount = 0;
-        while(inventory.size() < 10 && !enclosure.isEmpty()) {
+        int amount = 0; // Keep track of how many animals are collected
+
+        while(inventory.size() < FARMER_INVENTORY_CAP && !enclosure.isEmpty()) {
+            // Go through the collection delay
+            int waitTick = getCurrTick() + ENCLOSURE_COLLECTION_DELAY;
+            while(waitTick > getCurrTick()) {}
+
             inventory.add(enclosure.removeLast());
             amount++;
         }
