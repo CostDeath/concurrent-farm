@@ -19,7 +19,7 @@ public class Field {
         this.currAmount -= 1;
     }
 
-    public int getAmount() {
+    public synchronized int getAmount() {
         return this.currAmount;
     }
 }

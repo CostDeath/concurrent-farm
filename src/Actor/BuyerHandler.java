@@ -25,7 +25,7 @@ public class BuyerHandler extends Thread {
         }
     }
 
-    private boolean fieldsAreFree() {
+    private boolean fieldsAreBusy() {
         int busyFields = 0;
         for (Field field : fields) {
             if (field.buyerPresent) {
@@ -37,7 +37,7 @@ public class BuyerHandler extends Thread {
     }
 
     private void getNextAvailableBuyer() {
-        if (!fieldsAreFree()) {
+        if (fieldsAreBusy()) {
             return;
         }
 
