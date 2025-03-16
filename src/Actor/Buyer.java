@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import static Service.TickHandler.getCurrTick;
+
 public class Buyer extends Thread {
     private final List<Field> fields;
     private final int id;
@@ -32,7 +34,13 @@ public class Buyer extends Thread {
     @Override
     public void run() {
         this.fieldOfChoice.buyerPresent(true);
-        while (this.fieldOfChoice.getAmount() == 0) {}
+        int ticksWaited = 0;
+        int lastTick = getCurrTick();
+        while (this.fieldOfChoice.getAmount() == 0) {
+            if (lastTick < getCurrTick()) {
+                ticksWaited += 1; // ticks waited
+            }
+        }
 
         // buyer bought an animal
         this.fieldOfChoice.reduceAmount();
