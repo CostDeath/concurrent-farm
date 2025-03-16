@@ -18,17 +18,19 @@ public class BuyerHandler extends Thread {
         this.fields = new ArrayList<>(fields);
     }
 
-    private void spawnBuyer(int id) {
+    private int spawnBuyer(int id) {
         int hit = 1;
         if (this.spawnRate.nextInt(10) == hit) {
             buyerQueue.add(new Buyer(id, this.fields));
+            id += 1;
         }
+        return id;
     }
 
     private boolean fieldsAreBusy() {
         int busyFields = 0;
         for (Field field : fields) {
-            if (field.buyerPresent) {
+            if (field.isBuyerPresent()) {
                 busyFields += 1;
             }
         }
@@ -43,7 +45,7 @@ public class BuyerHandler extends Thread {
 
         for (int i = 0; i < buyerQueue.size(); i++) {
             Buyer buyer = buyerQueue.get(i);
-            if (!buyer.getFieldOfChoice().buyerPresent) {
+            if (!buyer.getFieldOfChoice().isBuyerPresent()) {
                 buyer.start();
                 buyerQueue.remove(i);
                 break;
@@ -56,7 +58,7 @@ public class BuyerHandler extends Thread {
         int id = 0;
         while (true) {
             if(lastTick < getCurrTick()) {
-                spawnBuyer(id);
+                id = spawnBuyer(id);
                 lastTick = getCurrTick();
             }
 

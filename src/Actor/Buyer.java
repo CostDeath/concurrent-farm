@@ -36,7 +36,7 @@ public class Buyer extends Thread {
         this.fieldOfChoice.buyerPresent(true);
         int ticksWaited = 0;
         int lastTick = getCurrTick();
-        while (this.fieldOfChoice.getAmount() == 0) {
+        while (this.fieldOfChoice.getAmount() == 0 || this.fieldOfChoice.isFarmerPresent()) {
             if (lastTick < getCurrTick()) {
                 ticksWaited += 1; // ticks waited
             }
