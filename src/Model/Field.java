@@ -31,16 +31,15 @@ public class Field {
         // Enter queue
         var positionInQueue = buyersWaiting;
         buyersWaiting++;
-        Logger.buyerWaiting(buyer, animalType, positionInQueue);
 
         // Queue loop, 1 iteration each time you move forward
         while (positionInQueue != 0 || currAmount == 0) {
             try {
+                Logger.buyerWaiting(buyer, animalType, positionInQueue);
                 if (positionInQueue != 0 && currAmount != 0) {
                     positionInQueue--;
                 }
-                wait();
-                System.out.println("NOTIFIED");
+                if(currAmount == 0) wait();
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
