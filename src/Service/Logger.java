@@ -15,8 +15,13 @@ public abstract class Logger {
         System.out.printf((log) + "%n", tick, id, thread, amount, ticks, inventory.toString());
     }
 
+    public static void animalDropOff(int tick, int id, String thread, int amount, AnimalType type, int ticks, List<AnimalType> inventory) {
+        String log = "Tick %d\t| Farmer %d\t(%s) | Dropped off %dx%s (after %d ticks). Current Inventory: %s";
+        System.out.printf((log) + "%n", tick, id, thread, amount, type, ticks, inventory.toString());
+    }
+
     public static void travel(int tick, int id, String thread, String place, int ticks) {
         String log = "Tick %d\t| Farmer %d\t(%s) | Travelled to %s (after %d ticks)";
-        System.out.printf((log) + "%n", tick, thread, id, place, ticks);
+        System.out.printf((log) + "%n", tick, id, thread, place, ticks);
     }
 }

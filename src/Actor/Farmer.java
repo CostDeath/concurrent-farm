@@ -9,6 +9,7 @@ import java.util.List;
 
 import static Actor.Enclosure.getAnimalsFromEnclosure;
 import static Actor.Enclosure.isEnclosureEmpty;
+import static Model.AnimalType.Pig;
 import static Service.PropertyManager.getProp;
 import static Service.TickHandler.getCurrTick;
 
@@ -49,7 +50,18 @@ public class Farmer extends Thread {
         Logger.animalCollection(getCurrTick(), id, threadName, amount, getCurrTick() - start, inventory);
     }
 
-    private void putAnimalsInFields() {}
+    private void putAnimalsInFields() {
+        for(AnimalType animal: AnimalType.values()) {
+            int start = getCurrTick();
+            if(inventory.contains(animal)) {
+                moveTo(animal);
+                // Temporary code, replace with sync hash map later
+                var field = fields.stream().filter(it -> it.getAnimalType().equals(animal)).findFirst().orElseThrow();
+                int amount = field.putAnimalsInField(inventory);
+                Logger.animalDropOff(getCurrTick(), id, threadName, amount, animal, getCurrTick() - start, inventory);
+            }
+        }
+    }
 
     private void moveTo(AnimalType newLocation) {
         // Move only if needed

@@ -9,7 +9,7 @@ public abstract class PropertyManager {
 
     public static void loadProps() {
         try {
-            prop.load(new FileInputStream("config.properties"));
+            prop.load(new FileInputStream("src/config.properties"));
         } catch (IOException e) {
             System.err.println("Error opening properties file: " + e.getMessage());
             System.err.println("Current working dir: " + System.getProperty("user.dir"));
