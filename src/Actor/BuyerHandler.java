@@ -1,6 +1,7 @@
 package Actor;
 
 import Model.Field;
+import Service.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,9 +20,10 @@ public class BuyerHandler extends Thread {
     }
 
     private int spawnBuyer(int id) {
-        int hit = 1;
+        int hit = 0;
         if (this.spawnRate.nextInt(10) == hit) {
             buyerQueue.add(new Buyer(id, this.fields));
+            Logger.buyerAppeared(getCurrTick(), id, buyerQueue.getLast().getFieldOfChoice().getAnimalType().name());
             id += 1;
         }
         return id;

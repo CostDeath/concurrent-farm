@@ -6,17 +6,37 @@ import java.util.List;
 
 public abstract class Logger {
     public static void animalArrival(int tick, int amt, String list) {
-        String log = "Tick %d\t| %d animals arrived in the enclosure. Current enclosure: %s";
+        String log = "Tick %d\t| %d animals arrived in the enclosure. Current enclosure: \n%s"; //
         System.out.printf((log) + "%n", tick, amt, list);
     }
 
     public static void animalCollection(int tick, int id, String thread, int amount, int ticks, List<AnimalType> inventory) {
-        String log = "Tick %d\t| Farmer %d\t(%s) | Picked up %d animals (after %d ticks). Current Inventory: %s";
+        String log = "Tick %d\t| Farmer %d\t(%s) | Picked up %d animals (after %d ticks). Current Inventory: %s"; //
         System.out.printf((log) + "%n", tick, id, thread, amount, ticks, inventory.toString());
     }
 
     public static void travel(int tick, int id, String thread, String place, int ticks) {
-        String log = "Tick %d\t| Farmer %d\t(%s) | Travelled to %s (after %d ticks)";
-        System.out.printf((log) + "%n", tick, thread, id, place, ticks);
+        String log = "Tick %d\t| Farmer %d\t(%s) | Travelled to %s field (after %d ticks)";
+        System.out.printf((log) + "%n", tick, id, thread, place, ticks);
+    }
+
+    public static void sendToFields(int tick, int id, String thread, String animalType, int amount) {
+        String log = "Tick %d\t| Farmer %d\t(%s) | added %d animals to %s field";
+        System.out.printf((log) + "%n", tick, id, thread, amount, animalType);
+    }
+
+    public static void buyerBought(int tick, int id, String thread, int ticksWaited, String animalType) {
+        String log = "Tick %d\t| Buyer %d\t(%s) | waited %d and bought from %s field";
+        System.out.printf((log) + "%n", tick, id, thread, ticksWaited, animalType);
+    }
+
+    public static void buyerAppeared(int tick, int id, String animalType) {
+        String log = "Tick %d\t| Buyer %d has appeared and would like a %s";
+        System.out.printf((log) + "%n", tick, id, animalType);
+    }
+
+    public static void buyerStarting(int tick, int id, String thread, String animalType) {
+        String log = "Tick %d\t| Buyer %d\t(%s) | Buyer is now waiting at the field for %s";
+        System.out.printf((log) + "%n", tick, id, thread, animalType);
     }
 }

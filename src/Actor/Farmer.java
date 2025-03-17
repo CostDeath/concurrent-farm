@@ -42,30 +42,33 @@ public class Farmer extends Thread {
         }
     }
 
-    private void getMoreAnimals() {
+    private synchronized void getMoreAnimals() {
         moveTo(null); // Null location is the enclosure
         int start = getCurrTick();
         int amount = getAnimalsFromEnclosure(inventory);
         Logger.animalCollection(getCurrTick(), id, threadName, amount, getCurrTick() - start, inventory);
     }
 
-    private void putAnimalsInFields() {
+    private synchronized void putAnimalsInFields() {
         for (Field field : fields) {
             moveTo(field.getAnimalType());
+            int amountAdded = 0;
             if (field.getAmount() < Field.MAX_OCCUPANCY && !field.isFarmerPresent()) { // if these conditions arent met, farmer moves on to next field
                 field.farmerPresent(true);
                 int i = 0;
-                while (i < inventory.size()) {
-                    if (inventory.get(i) != field.getAnimalType()) {
+                while (i < this.inventory.size()) {
+                    if (this.inventory.get(i) != field.getAnimalType()) {
                         i += 1;
                     } else if (field.getAmount() == Field.MAX_OCCUPANCY) { // max cap filled
                         break;
                     } else {
                         field.incrementAmount();
-                        inventory.remove(i); // animal has been moved to field
+                        this.inventory.remove(i); // animal has been moved to field
+                        amountAdded += 1;
                     }
                 }
                 field.farmerPresent(false);
+                Logger.sendToFields(getCurrTick(), this.id, this.threadName, field.getAnimalType().name(), amountAdded);
             }
         }
     }
@@ -78,7 +81,7 @@ public class Farmer extends Thread {
             String placeName = newLocation == null ? "Enclosure" : newLocation.name();
             while(waitTick > getCurrTick()) {}
             location = newLocation;
-            Logger.travel(getCurrTick(), id, threadName, placeName, start - getCurrTick());
+            Logger.travel(getCurrTick(), id, threadName, placeName,  getCurrTick() - start);
         }
     }
 }

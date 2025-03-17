@@ -1,6 +1,7 @@
 package Actor;
 
 import Model.Field;
+import Service.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,13 +12,12 @@ import static Service.TickHandler.getCurrTick;
 public class Buyer extends Thread {
     private final List<Field> fields;
     private final int id;
-    private final String threadName;
+    private String threadName;
     private Field fieldOfChoice;
     private final Random decisionMaker = new Random();
 
     public Buyer(int id, List<Field> fields) {
         this.id = id;
-        this.threadName = Thread.currentThread().getName();
         this.fields = new ArrayList<>(fields);
         chooseRandomField();
     }
@@ -33,12 +33,15 @@ public class Buyer extends Thread {
 
     @Override
     public void run() {
+        this.threadName = Thread.currentThread().getName();
         this.fieldOfChoice.buyerPresent(true);
+        Logger.buyerStarting(getCurrTick(), this.id, this.threadName, this.fieldOfChoice.getAnimalType().name());
         int ticksWaited = 0;
         int lastTick = getCurrTick();
         while (this.fieldOfChoice.getAmount() == 0 || this.fieldOfChoice.isFarmerPresent()) {
             if (lastTick < getCurrTick()) {
                 ticksWaited += 1; // ticks waited
+                lastTick = getCurrTick();
             }
         }
 
@@ -47,6 +50,8 @@ public class Buyer extends Thread {
 
         // buyer leaves
         this.fieldOfChoice.buyerPresent(false);
+
+        Logger.buyerBought(getCurrTick(), this.id, this.threadName, ticksWaited, this.fieldOfChoice.getAnimalType().name());
 
 
         // Functionality Here
