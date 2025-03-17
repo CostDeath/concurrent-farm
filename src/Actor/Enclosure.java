@@ -45,7 +45,7 @@ public class Enclosure extends Thread {
                 // Spawn animals based on random chance
                 if(Math.random() * ANIMAL_SPAWN_CHANCE < 1) {
                     enclosure.addAll(generateRandomAnimals());
-                    Logger.animalArrival(getCurrTick(), ANIMAL_SPAWN_AMOUNT, enclosure.toString());
+                    Logger.animalArrival(ANIMAL_SPAWN_AMOUNT, enclosure.toString());
                 }
                 lastTick = getCurrTick();
             }

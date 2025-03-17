@@ -42,11 +42,16 @@ public class Farmer extends Thread {
         }
     }
 
+    @Override
+    public String toString() {
+        return String.format("Farmer %d (%s)", this.id, this.threadName);
+    }
+
     private void getMoreAnimals() {
         moveTo(null); // Null location is the enclosure
         int start = getCurrTick();
         int amount = getAnimalsFromEnclosure(inventory);
-        Logger.animalCollection(getCurrTick(), id, threadName, amount, getCurrTick() - start, inventory);
+        Logger.animalCollection(this.toString(), amount, getCurrTick() - start, inventory);
     }
 
     private void putAnimalsInFields() {}
@@ -59,7 +64,7 @@ public class Farmer extends Thread {
             String placeName = newLocation == null ? "Enclosure" : newLocation.name();
             while(waitTick > getCurrTick()) {}
             location = newLocation;
-            Logger.travel(getCurrTick(), id, threadName, placeName, start - getCurrTick());
+            Logger.travel(this.toString(), placeName, start - getCurrTick());
         }
     }
 }
