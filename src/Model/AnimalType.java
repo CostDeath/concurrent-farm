@@ -1,9 +1,9 @@
 package Model;
 
 public enum AnimalType {
-    //Pig,
-    //Cow,
-    //Sheep,
-    //Llama,
+    Pig,
+    Cow,
+    Sheep,
+    Llama,
     Chicken
 }
