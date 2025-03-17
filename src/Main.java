@@ -1,40 +1,37 @@
-import Actor.Enclosure;
 import Actor.Farmer;
 import Model.AnimalType;
 import Model.Field;
+import Service.TickEventHandler;
 
-import java.util.Collections;
-import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import static Service.PropertyManager.getProp;
 import static Service.PropertyManager.loadProps;
-import static Service.TickHandler.runTickLoop;
+import static Service.TickLoopHandler.runTickLoop;
 
 public class Main {
     public static void main(String[] args) throws InterruptedException {
         loadProps();
-        createActors();
-        runTickLoop();
+        var tickEvent = new TickEventHandler();
+        var fields = createFields();
+        createFarmers(tickEvent, fields);
+        runTickLoop(tickEvent, fields);
     }
 
-    private static List<Field> createFields() {
-        return Collections.synchronizedList(
-                List.of(
-                        new Field(AnimalType.Pig),
-                        new Field(AnimalType.Cow),
-                        new Field(AnimalType.Sheep),
-                        new Field(AnimalType.Llama),
-                        new Field(AnimalType.Chicken)
-                )
-        );
-    }
-
-    private static void createActors() {
-        new Enclosure().start();
-        List<Field> fields = createFields();
-        int farmerAmount = getProp("farmer_amount");
+    private static void createFarmers(TickEventHandler tickEvent, ConcurrentMap<AnimalType, Field> fields) {
+        var farmerAmount = getProp("farmer_amount");
         for (int i = 1; i <= farmerAmount; i++) {
-            new Farmer(i, fields).start();
+            new Farmer(i, tickEvent, fields).start();
         }
+    }
+
+    private static ConcurrentMap<AnimalType, Field> createFields() {
+        var map = new ConcurrentHashMap<AnimalType, Field>();
+        // Create a field for each type of animal
+        for (AnimalType type : AnimalType.values()) {
+            map.put(type, new Field(type));
+        }
+        return map;
     }
 }
