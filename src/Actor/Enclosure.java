@@ -6,6 +6,7 @@ import Service.Logger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
 import static Model.AnimalType.*;
 import static Service.PropertyManager.getProp;
@@ -18,6 +19,7 @@ public class Enclosure extends Thread {
     private static final int FARMER_INVENTORY_CAP =  getProp("farmer_inventory_size");
     private static final List<AnimalType> enclosure = Collections.synchronizedList(new ArrayList<>());
     private int lastTick = 0;
+    private final Random spawner = new Random();
 
     public static synchronized boolean isEnclosureEmpty() {
         return enclosure.isEmpty();
@@ -43,7 +45,7 @@ public class Enclosure extends Thread {
             // Execute code only on new tick
             if(lastTick < getCurrTick()) {
                 // Spawn animals based on random chance
-                if(Math.random() * ANIMAL_SPAWN_CHANCE < 1) {
+                if(this.spawner.nextInt(ANIMAL_SPAWN_CHANCE) == 0) {
                     enclosure.addAll(generateRandomAnimals());
                     Logger.animalArrival(getCurrTick(), ANIMAL_SPAWN_AMOUNT, enclosure.toString());
                 }
