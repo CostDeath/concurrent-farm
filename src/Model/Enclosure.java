@@ -1,6 +1,7 @@
 package Model;
 
 import Service.Logger;
+import Service.TickEventHandler;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -10,6 +11,7 @@ import static Service.PropertyManager.getProp;
 
 public abstract class Enclosure {
     private static final int MAX_OCCUPANCY = getProp("max_enclosure_occupancy");
+    private static final int COLLECTION_DELAY = getProp("enclosure_collection_delay");
     private static final List<AnimalType> enclosure = Collections.synchronizedList(new ArrayList<>());
 
     public static synchronized void addAnimals(List<AnimalType> animals) {
@@ -27,13 +29,14 @@ public abstract class Enclosure {
         if(added != 0) Logger.animalArrival(added, enclosure.toString());
     }
 
-    public static synchronized void pickUpAnimals(String farmer, List<AnimalType> inventory, int cap) {
+    public static synchronized void pickUpAnimals(String farmer, TickEventHandler event, List<AnimalType> inventory, int cap) {
         int count = 0;
         while(inventory.size() < cap && !enclosure.isEmpty()) {
+            event.waitTicks(COLLECTION_DELAY);
             inventory.add(enclosure.removeFirst());
             count++;
         }
-        System.out.println(farmer + " picked up " + count + "animals from the enclosure");
+        if(count != 0) System.out.println(farmer + " picked up " + count + "animals from the enclosure");
     }
 
     public static synchronized boolean isEmpty() {

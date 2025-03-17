@@ -3,9 +3,12 @@ package Actor;
 import Model.AnimalType;
 import Model.Enclosure;
 import Model.Field;
+import Model.FieldRanking;
 import Service.TickEventHandler;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.ConcurrentMap;
 
@@ -37,13 +40,7 @@ public class Farmer extends Thread {
         while (true) {
             tickEvent.waitForEvent();
             attemptAnimalPickUp();
-            // If inv not empty, go to fields
-            // pick up all animals possible
-            // Return point 1
-            // Pick highest priority field
-            // go to field & put animals
-            // If inv not empty OR all fields busy, return to 1
-            // wait for tick
+            attemptAnimalDeposit();
         }
     }
 
@@ -51,13 +48,66 @@ public class Farmer extends Thread {
         if(Enclosure.isEmpty() || inventory.size() >= INVENTORY_CAP) return; // Do not get animals if inventory is full
 
         goTo(null); // Null field = enclosure
-        Enclosure.pickUpAnimals(this.toString(), inventory, INVENTORY_CAP);
+        Enclosure.pickUpAnimals(this.toString(), tickEvent, inventory, INVENTORY_CAP);
+    }
+
+    private void attemptAnimalDeposit() {
+        while(!inventory.isEmpty() && !areFieldsFull()) {
+            var field = decideField();
+            if(field == null) return; // If no field is suitable, try to pick up more animals
+
+            // Tell farmers you plan to deposit animals in the field
+            var interest = Collections.frequency(inventory, field.getAnimalType());
+            field.showInterest(interest);
+
+            goTo(field.getAnimalType());
+            field.depositAnimals(this.toString(), tickEvent, inventory, interest);
+        }
+    }
+
+    private Field decideField() {
+        // Remove any fields that the farmer has no animals for
+        // Also remove any fields which are full
+        var values = fields.values().stream().filter(
+                field -> inventory.contains(field.getAnimalType()) && !field.isFull()
+        ).toList();
+
+        // If all fields are full, choose no field
+        if(values.isEmpty()) return null;
+
+        // Rank how much fields need animals
+        List<FieldRanking> rankings = new ArrayList<>();
+        for(Field field : values) {
+            int ranking = field.getBuyerQueueSize(); // Add +1 point per buyer waiting
+            ranking += field.getAvailableSlotCount(); // Add +1 point per empty spot
+            ranking -= field.getInterest(); // Remove -1 point per animal another farmer is putting there
+            rankings.add(new FieldRanking(field, ranking));
+        }
+
+        // If multiple fields have the same rank, go with the one which we have the most animals for
+        // In the case of a tie, go with any
+        var max = Collections.max(rankings, Comparator.comparingInt(FieldRanking::ranking)).ranking();
+        rankings = rankings.stream().filter(rank -> rank.ranking() == max).toList(); // Remove any which aren't max rank
+
+        if(rankings.size() > 1) {
+            rankings = rankings.stream()
+                    // Change rank to be the amount of animals you have, prioritising what you have the most of
+                    .map(rank -> new FieldRanking(rank.field(), Collections.frequency(inventory, rank.field())))
+                    .toList();
+            return Collections.max(rankings, Comparator.comparingInt(FieldRanking::ranking)).field();
+        }
+
+        return rankings.getFirst().field();
+    }
+
+    private boolean areFieldsFull() {
+        return fields.values().stream().allMatch(Field::isFull);
     }
 
     private void goTo(AnimalType field) {
         if(location == field) return; // Do not penalise if already at location
 
-        tickEvent.waitForTick(getCurrTick() + MOVEMENT_DELAY + MOVEMENT_DELAY_PER_ANIMAL*inventory.size());
+        tickEvent.waitTicks(MOVEMENT_DELAY + MOVEMENT_DELAY_PER_ANIMAL*inventory.size());
         location = field;
         System.out.println(this + " moved to " + location);
     }
