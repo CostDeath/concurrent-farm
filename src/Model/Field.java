@@ -3,7 +3,7 @@ package Model;
 import java.util.List;
 
 import static Service.PropertyManager.getProp;
-import static Service.TickHandler.getCurrTick;
+import static Service.TickLoopHandler.getCurrTick;
 
 public class Field {
     public static final int MAX_OCCUPANCY = getProp("max_field_occupancy");
@@ -16,27 +16,4 @@ public class Field {
         this.animalType = animalType;
     }
 
-    public synchronized boolean isFull() {
-        return currAmount >= MAX_OCCUPANCY;
-    }
-
-    public synchronized AnimalType getAnimalType() {
-        return animalType;
-    }
-
-    public synchronized int putAnimalsInField(List<AnimalType> inventory) {
-        int amount = 0; // Keep track of how many animals are put
-
-        while(inventory.contains(animalType) && currAmount < MAX_OCCUPANCY) {
-            // Set the delay
-            int waitTick = getCurrTick() + DROP_OFF_DELAY;
-
-            inventory.remove(animalType);
-            currAmount++;
-
-            while(waitTick > getCurrTick()) {}
-            amount++;
-        }
-        return amount;
-    }
 }
