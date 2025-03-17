@@ -26,7 +26,7 @@ public abstract class Logger {
     }
 
     public static void buyerBought(int tick, int id, String thread, int ticksWaited, String animalType) {
-        String log = "Tick %d\t| Buyer %d\t(%s) | waited %d and bought from %s field";
+        String log = "Tick %d\t| Buyer %d\t(%s) | waited %d ticks and bought from %s field";
         System.out.printf((log) + "%n", tick, id, thread, ticksWaited, animalType);
     }
 

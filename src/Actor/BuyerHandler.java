@@ -7,12 +7,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import static Service.PropertyManager.getProp;
 import static Service.TickHandler.getCurrTick;
 
 public class BuyerHandler extends Thread {
     List<Field> fields;
     List<Buyer> buyerQueue = new ArrayList<>();
     Random spawnRate = new Random();
+    private final static int SPAWN_CHANCE = getProp("buyer_spawn_chance");
     private int lastTick = 0;
 
     public BuyerHandler(List<Field> fields) {
@@ -21,7 +23,7 @@ public class BuyerHandler extends Thread {
 
     private int spawnBuyer(int id) {
         int hit = 0;
-        if (this.spawnRate.nextInt(10) == hit) {
+        if (this.spawnRate.nextInt(SPAWN_CHANCE) == hit) {
             buyerQueue.add(new Buyer(id, this.fields));
             Logger.buyerAppeared(getCurrTick(), id, buyerQueue.getLast().getFieldOfChoice().getAnimalType().name());
             id += 1;
