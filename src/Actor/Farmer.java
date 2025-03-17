@@ -4,6 +4,7 @@ import Model.AnimalType;
 import Model.Enclosure;
 import Model.Field;
 import Model.FieldRanking;
+import Service.Logger;
 import Service.TickEventHandler;
 
 import java.util.ArrayList;
@@ -45,16 +46,16 @@ public class Farmer extends Thread {
     }
 
     private void attemptAnimalPickUp() {
-        if(Enclosure.isEmpty() || inventory.size() >= INVENTORY_CAP) return; // Do not get animals if inventory is full
+        if (Enclosure.isEmpty() || inventory.size() >= INVENTORY_CAP) return; // Do not get animals if inventory is full
 
         goTo(null); // Null field = enclosure
         Enclosure.pickUpAnimals(this.toString(), tickEvent, inventory, INVENTORY_CAP);
     }
 
     private void attemptAnimalDeposit() {
-        while(!inventory.isEmpty() && !areFieldsFull()) {
+        while (!inventory.isEmpty() && !areFieldsFull()) {
             var field = decideField();
-            if(field == null) return; // If no field is suitable, try to pick up more animals
+            if (field == null) return; // If no field is suitable, try to pick up more animals
 
             // Tell farmers you plan to deposit animals in the field
             var interest = Collections.frequency(inventory, field.getAnimalType());
@@ -73,11 +74,11 @@ public class Farmer extends Thread {
         ).toList();
 
         // If all fields are full, choose no field
-        if(values.isEmpty()) return null;
+        if (values.isEmpty()) return null;
 
         // Rank how much fields need animals
         List<FieldRanking> rankings = new ArrayList<>();
-        for(Field field : values) {
+        for (Field field : values) {
             int ranking = field.getBuyerQueueSize(); // Add +1 point per buyer waiting
             ranking += field.getAvailableSlotCount(); // Add +1 point per empty spot
             ranking -= field.getInterest(); // Remove -1 point per animal another farmer is putting there
@@ -89,7 +90,7 @@ public class Farmer extends Thread {
         var max = Collections.max(rankings, Comparator.comparingInt(FieldRanking::ranking)).ranking();
         rankings = rankings.stream().filter(rank -> rank.ranking() == max).toList(); // Remove any which aren't max rank
 
-        if(rankings.size() > 1) {
+        if (rankings.size() > 1) {
             rankings = rankings.stream()
                     // Change rank to be the amount of animals you have, prioritising what you have the most of
                     .map(rank -> new FieldRanking(rank.field(), Collections.frequency(inventory, rank.field())))
@@ -105,11 +106,12 @@ public class Farmer extends Thread {
     }
 
     private void goTo(AnimalType field) {
-        if(location == field) return; // Do not penalise if already at location
+        if (location == field) return; // Do not penalise if already at location
+        var start = getCurrTick();
 
-        tickEvent.waitTicks(MOVEMENT_DELAY + MOVEMENT_DELAY_PER_ANIMAL*inventory.size());
+        tickEvent.waitTicks(MOVEMENT_DELAY + MOVEMENT_DELAY_PER_ANIMAL * inventory.size());
         location = field;
-        System.out.println(this + " moved to " + location);
+        Logger.travel(this.toString(), location, start);
     }
 
     @Override

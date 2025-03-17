@@ -1,6 +1,7 @@
 package Model;
 
-public record FieldRanking (
+public record FieldRanking(
         Field field,
         int ranking
-) {}
+) {
+}

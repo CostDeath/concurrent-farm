@@ -13,7 +13,7 @@ public abstract class TickLoopHandler {
     private static int currTick = 0;
 
     public static void runTickLoop(TickEventHandler event, ConcurrentMap<AnimalType, Field> fields) throws InterruptedException {
-        while(true) {
+        while (true) {
             Thread.sleep(MILLIS_PER_TICK);
             currTick++;
             new TickHandler(event, fields).start();

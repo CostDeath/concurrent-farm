@@ -29,7 +29,7 @@ public class Main {
     private static ConcurrentMap<AnimalType, Field> createFields() {
         var map = new ConcurrentHashMap<AnimalType, Field>();
         // Create a field for each type of animal
-        for(AnimalType type: AnimalType.values()) {
+        for (AnimalType type : AnimalType.values()) {
             map.put(type, new Field(type));
         }
         return map;

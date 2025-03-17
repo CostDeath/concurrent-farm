@@ -2,53 +2,64 @@ package Service;
 
 import Model.AnimalType;
 
+import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 import static Service.TickLoopHandler.getCurrTick;
 
 public abstract class Logger {
-    public static void animalArrival(int amt, String list) {
-        String log = "Tick %d\t| %d animals arrived in the enclosure. Current enclosure: %s";
-        System.out.printf((log) + "%n", getCurrTick(), amt, list);
+    public static void animalArrival(int amount, List<AnimalType> enclosure) {
+        var log = "%s %d animals arrived in the enclosure. Current enclosure: %s";
+        System.out.printf((log) + "%n", getTick(), amount, formatList(enclosure));
     }
 
-    public static void animalCollection(int tick, int id, String thread, int amount, int ticks, List<AnimalType> inventory) {
-        String log = "Tick %d\t| Farmer %d\t(%s) | Picked up %d animals (after %d ticks). Current Inventory: %s";
-        System.out.printf((log) + "%n", tick, id, thread, amount, ticks, inventory.toString());
+    public static void animalCollection(String farmer, int amount, int start, List<AnimalType> inventory) {
+        String log = "%s %s picked up %d animals (After %d ticks). Current Inventory: %s";
+        System.out.printf((log) + "%n", getTick(), farmer, amount, getCurrTick() - start, formatList(inventory));
     }
 
-    public static void animalDropOff(int tick, int id, String thread, int amount, AnimalType type, int ticks, List<AnimalType> inventory) {
-        String log = "Tick %d\t| Farmer %d\t(%s) | Dropped off %dx%s (after %d ticks). Current Inventory: %s";
-        System.out.printf((log) + "%n", tick, id, thread, amount, type, ticks, inventory.toString());
+    public static void travel(String farmer, AnimalType place, int start) {
+        String log = "%s %s | Travelled to %s (After %d ticks)";
+        System.out.printf((log) + "%n", getTick(), farmer, formatField(place), getCurrTick() - start);
     }
 
-    public static void travel(int tick, int id, String thread, String place, int ticks) {
-        String log = "Tick %d\t| Farmer %d\t(%s) | Travelled to %s (after %d ticks)";
-        System.out.printf((log) + "%n", tick, id, thread, place, ticks);
+    public static void animalDeposit(String farmer, int amount, AnimalType animalType, int start, int inField) {
+        String log = "%s %s deposited %s (After %d ticks). Currently in field: %s";
+        System.out.printf((log) + "%n", getTick(), farmer, formatCount(amount, animalType), getCurrTick() - start, formatCount(inField, animalType));
     }
 
-    public static void sendToFields(int tick, int id, String thread, String animalType, int amount) {
-        String log = "Tick %d\t| Farmer %d\t(%s) | added %d animals to %s field";
-        System.out.printf((log) + "%n", tick, id, thread, amount, animalType);
+    public static void buyerBought(String buyer, AnimalType animalType, int start) {
+        String log = "%s %s bought 1 %s (After %d ticks)";
+        System.out.printf((log) + "%n", getTick(), buyer, animalType, getCurrTick() - start);
     }
 
-    public static void busyField(int tick, int id, String thread, String animalType) {
-        String log = "Tick %d\t| Farmer %d\t(%s) | %s field is busy, moving to next field...";
-        System.out.printf((log) + "%n", tick, id, thread, animalType);
+    public static void buyerWaiting(String buyer, AnimalType animal, int position) {
+        String log = "%s %s wants %s. Queue position: %d";
+        System.out.printf((log) + "%n", getTick(), buyer, animal, position);
     }
 
-    public static void buyerBought(int tick, int id, String thread, int ticksWaited, String animalType) {
-        String log = "Tick %d\t| Buyer %d\t(%s) | waited %d ticks and bought from %s field";
-        System.out.printf((log) + "%n", tick, id, thread, ticksWaited, animalType);
+    private static String getTick() {
+        return "\u001B[36mTick %d\033[0m\t|".formatted(getCurrTick());
     }
 
-    public static void buyerAppeared(int tick, int id, String animalType) {
-        String log = "Tick %d\t| Buyer %d has appeared and would like a %s";
-        System.out.printf((log) + "%n", tick, id, animalType);
+    private static String formatList(List<AnimalType> list) {
+        var builder = new StringBuilder("[");
+        for (AnimalType type : new LinkedHashSet<>(list)) {
+            builder.append(formatCount(Collections.frequency(list, type), type));
+            builder.append(", ");
+        }
+        builder.delete(builder.length() - 2, builder.length());
+        builder.append("]");
+        return builder.toString();
     }
 
-    public static void buyerStarting(int tick, int id, String thread, String animalType) {
-        String log = "Tick %d\t| Buyer %d\t(%s) | Buyer is now waiting at the field for %s";
-        System.out.printf((log) + "%n", tick, id, thread, animalType);
+    private static String formatCount(int count, AnimalType type) {
+        return "\033[0;33m%dx\u001B[35m%s\033[0m".formatted(count, type);
+    }
+
+    private static String formatField(AnimalType type) {
+        if (type == null) return "Enclosure";
+        else return type + " Field";
     }
 }

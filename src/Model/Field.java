@@ -1,6 +1,6 @@
 package Model;
 
-import Actor.Buyer;
+import Service.Logger;
 import Service.TickEventHandler;
 
 import java.util.List;
@@ -22,45 +22,50 @@ public class Field {
         this.animalType = animalType;
     }
 
-    public synchronized void buyAnimal(String buyer) {
-        // Kill buyer if max buyers
-        if(MAX_BUYER_QUEUE != 0 && buyersWaiting == MAX_BUYER_QUEUE) return;
+    public synchronized void buyAnimal(String buyer, TickEventHandler tickEvent) {
+        var start = getCurrTick();
 
-        // Queue system
-        if(currAmount == 0) {
-            buyersWaiting++;
-            var positionInQueue = buyersWaiting;
-            System.out.println(buyer + " is currently in position: " + positionInQueue);
-            while(positionInQueue != 0) {
-                try {
-                    if(currAmount != 0) {
-                        positionInQueue--;
-                        System.out.println(buyer + " is currently in position: " + positionInQueue);
-                    };
-                    wait();
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
+        // Kill buyer if max buyers
+        if (MAX_BUYER_QUEUE != 0 && buyersWaiting == MAX_BUYER_QUEUE) return;
+
+        // Enter queue
+        var positionInQueue = buyersWaiting;
+        buyersWaiting++;
+        Logger.buyerWaiting(buyer, animalType, positionInQueue);
+
+        // Queue loop, 1 iteration each time you move forward
+        while (positionInQueue != 0 || currAmount == 0) {
+            try {
+                if (positionInQueue != 0 && currAmount != 0) {
+                    positionInQueue--;
                 }
+                wait();
+                System.out.println("NOTIFIED");
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
             }
-            notifyAll();
-            buyersWaiting--;
         }
 
-        // Buy animal
+        // Buy the animal
         currAmount--;
-        System.out.println(buyer + " just bought 1 " + animalType);
+        buyersWaiting--;
+        tickEvent.waitForEvent();
+
+        Logger.buyerBought(buyer, animalType, start);
     }
 
     public synchronized void depositAnimals(String farmer, TickEventHandler event, List<AnimalType> inventory, int interest) {
+        var start = getCurrTick();
         var count = 0;
-        while(inventory.contains(animalType) && currAmount < MAX_OCCUPANCY) {
+        while (inventory.contains(animalType) && currAmount < MAX_OCCUPANCY) {
             event.waitTicks(DROP_OFF_DELAY);
             inventory.remove(animalType);
             currAmount++;
             count++;
         }
         currInterest -= interest;
-        System.out.println(farmer + " deposited " + count + "x" + animalType);
+        notifyAll();
+        Logger.animalDeposit(farmer, count, animalType, start, currAmount);
     }
 
     public synchronized boolean isFull() {

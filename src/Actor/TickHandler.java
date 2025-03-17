@@ -6,7 +6,6 @@ import Model.Field;
 import Service.TickEventHandler;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.ConcurrentMap;
 
 import static Service.PropertyManager.getProp;
@@ -34,11 +33,11 @@ public class TickHandler extends Thread {
 
     private void attemptAnimalSpawn() {
         // Spawn animals based on random chance
-        if(Math.random() * ANIMAL_SPAWN_CHANCE < 1) {
+        if (Math.random() * ANIMAL_SPAWN_CHANCE < 1) {
             var allAnimals = AnimalType.values();
             var newAnimals = new ArrayList<AnimalType>();
 
-            for(int i = 0; i < ANIMAL_SPAWN_AMOUNT; i++) {
+            for (int i = 0; i < ANIMAL_SPAWN_AMOUNT; i++) {
                 // Generate rand int between 0 and amount of animals
                 var type = (int) (Math.random() * allAnimals.length - 1);
                 newAnimals.add(allAnimals[type]); // add animal corresponding to int
@@ -49,13 +48,13 @@ public class TickHandler extends Thread {
 
     private void attemptBuyerSpawn() {
         // Spawn buyers based on random chance
-        if(Math.random() * BUYER_SPAWN_CHANCE < 1) {
+        if (Math.random() * BUYER_SPAWN_CHANCE < 1) {
             var allFields = AnimalType.values();
 
-            for(int i = 0; i < BUYER_SPAWN_AMOUNT; i++) {
+            for (int i = 0; i < BUYER_SPAWN_AMOUNT; i++) {
                 // Generate rand int between 0 and amount of animals
                 var type = (int) (Math.random() * allFields.length - 1);
-                new Buyer(fields.get(allFields[type])).start(); // create buyer of corresponding field
+                new Buyer(fields.get(allFields[type]), event).start(); // create buyer of corresponding field
             }
         }
     }
