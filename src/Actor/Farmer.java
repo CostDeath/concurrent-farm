@@ -72,6 +72,9 @@ public class Farmer extends Thread {
                 while (lastTick == getCurrTick()) {} // making buyer wait 1 tick simulates the farmer finishing adding stock
                 field.farmerPresent(false);
             }
+            else {
+                Logger.busyField(getCurrTick(), this.id, this.threadName, field.getAnimalType().name());
+            }
         }
     }
 

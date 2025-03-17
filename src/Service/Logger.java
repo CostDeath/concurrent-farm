@@ -25,6 +25,11 @@ public abstract class Logger {
         System.out.printf((log) + "%n", tick, id, thread, amount, animalType);
     }
 
+    public static void busyField(int tick, int id, String thread, String animalType) {
+        String log = "Tick %d\t| Farmer %d\t(%s) | %s field is busy, moving to next field...";
+        System.out.printf((log) + "%n", tick, id, thread, animalType);
+    }
+
     public static void buyerBought(int tick, int id, String thread, int ticksWaited, String animalType) {
         String log = "Tick %d\t| Buyer %d\t(%s) | waited %d ticks and bought from %s field";
         System.out.printf((log) + "%n", tick, id, thread, ticksWaited, animalType);
