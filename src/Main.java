@@ -1,5 +1,4 @@
 import Actor.Farmer;
-import Actor.TestThread;
 import Model.AnimalType;
 import Model.Field;
 import Service.TickEventHandler;
