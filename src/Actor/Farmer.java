@@ -20,12 +20,15 @@ public class Farmer extends Thread {
     private static final int INVENTORY_CAP = getProp("farmer_inventory_size");
     private static final int MOVEMENT_DELAY = getProp("farmer_movement_delay");
     private static final int MOVEMENT_DELAY_PER_ANIMAL = getProp("farmer_movement_delay_per_animal");
+    private static final int BREAK_GAP = getProp("break_gap");
+    private static final int BREAK_LENGTH = getProp("break_length");
 
     private final int id;
     private final TickEventHandler tickEvent;
     private final ConcurrentMap<AnimalType, Field> fields;
     private final List<AnimalType> inventory = new ArrayList<>();
 
+    private int lastBreakTick = 0;
     private String threadName;
     private AnimalType location;
 
@@ -50,6 +53,7 @@ public class Farmer extends Thread {
 
         goTo(null); // Null field = enclosure
         Enclosure.pickUpAnimals(this.toString(), tickEvent, inventory, INVENTORY_CAP);
+        attemptBreak();
     }
 
     private void attemptAnimalDeposit() {
@@ -63,6 +67,7 @@ public class Farmer extends Thread {
 
             goTo(field.getAnimalType());
             field.depositAnimals(this.toString(), tickEvent, inventory, interest);
+            attemptBreak();
         }
     }
 
@@ -99,6 +104,13 @@ public class Farmer extends Thread {
         }
 
         return rankings.getFirst().field();
+    }
+
+    private void attemptBreak() {
+        if (lastBreakTick + BREAK_GAP > getCurrTick()) {
+            tickEvent.waitTicks(BREAK_LENGTH);
+            lastBreakTick = getCurrTick();
+        }
     }
 
     private boolean areFieldsFull() {
