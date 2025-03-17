@@ -24,7 +24,7 @@ public class Farmer extends Thread {
 
     @Override
     public void run() {
-        this.threadName = Thread.currentThread().getName();
+        threadName = Thread.currentThread().getName();
         while (true) {
             tickEvent.waitForEvent();
             System.out.println(threadName + " | " + getCurrTick());

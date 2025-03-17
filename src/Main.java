@@ -15,12 +15,12 @@ public class Main {
     public static void main(String[] args) throws InterruptedException {
         loadProps();
         var tickEvent = new TickEventHandler();
-        createFarmers(tickEvent);
-        runTickLoop(tickEvent);
+        var fields = createFields();
+        createFarmers(tickEvent, fields);
+        runTickLoop(tickEvent, fields);
     }
 
-    private static void createFarmers(TickEventHandler tickEvent) {
-        var fields = createFields();
+    private static void createFarmers(TickEventHandler tickEvent, ConcurrentMap<AnimalType, Field> fields) {
         var farmerAmount = getProp("farmer_amount");
         for (int i = 1; i <= farmerAmount; i++) {
             new Farmer(i, tickEvent, fields).start();
